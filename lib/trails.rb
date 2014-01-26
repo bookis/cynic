@@ -14,6 +14,6 @@ end
 
 require 'trails/app'
 require 'trails/response'
-require 'trails/route'
+require 'trails/routing'
 require 'trails/controller'
 require 'trails/renderer'

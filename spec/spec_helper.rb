@@ -1,2 +1,2 @@
 require 'trails'
-require 'support/route'
+require 'support/routing'

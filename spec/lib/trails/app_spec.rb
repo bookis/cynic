@@ -3,11 +3,11 @@ require 'spec_helper'
 describe Trails::App do
   let(:env) { {"REQUEST_METHOD" => "GET", "REQUEST_URI" => "/trails"} }
   let(:trail) { Trails::App.new() }
-  before { defined_route(trail) }
+  before { defined_routing(trail) }
   
-  describe "#route" do
-    it "returns a route object" do
-      expect(trail.route).to be_an_instance_of Trails::Route
+  describe "#routing" do
+    it "returns a routing object" do
+      expect(trail.routing).to be_an_instance_of Trails::Routing
     end
   end
   describe "#call" do

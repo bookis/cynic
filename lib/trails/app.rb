@@ -1,9 +1,9 @@
 module Trails
   class App
-    attr_reader :route
+    attr_reader :routing
     
     def initialize
-      @route = Route.new
+      @routing = Routing.new
     end
     
     def call(env)
@@ -11,8 +11,8 @@ module Trails
       send_response
     end
     
-    def route_to_request
-      route.go_to @env["REQUEST_METHOD"].downcase.to_sym, @env["REQUEST_URI"]
+    def routing_to_request
+      routing.go_to @env["REQUEST_METHOD"].downcase.to_sym, @env["REQUEST_URI"]
     end
     
     def send_response
@@ -20,7 +20,7 @@ module Trails
     end
     
     def response
-      Response.new(self.route_to_request)
+      Response.new(self.routing_to_request)
     end
     
     def status
