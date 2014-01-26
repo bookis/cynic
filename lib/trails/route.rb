@@ -1,4 +1,4 @@
-module Trail
+module Trails
   class Route
     class Error < StandardError;end
     

@@ -1,4 +1,4 @@
-module Trail
+module Trails
   class Response
     attr_reader :body
     def initialize(body)

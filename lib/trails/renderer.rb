@@ -1,4 +1,4 @@
-module Trail
+module Trails
   class Renderer
     def initialize(path)
       @full_path = path_prefix + path

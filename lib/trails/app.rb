@@ -1,4 +1,4 @@
-module Trail
+module Trails
   class App
     def initialize(routing=nil)
       @routing = routing || Route.new

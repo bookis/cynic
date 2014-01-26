@@ -1,4 +1,4 @@
-module Trail
+module Trails
   class Controller
     def render(action)
       @action = action

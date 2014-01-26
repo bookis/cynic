@@ -4,3 +4,4 @@ require 'trails/response'
 require 'trails/route'
 require 'trails/controller'
 require 'trails/renderer'
+

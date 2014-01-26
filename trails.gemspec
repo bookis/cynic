@@ -8,9 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Trails::VERSION
   spec.authors       = ["Bookis Smuin"]
   spec.email         = ["bookis.smuin@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
+  spec.description   = %q{A Lightweight Rack-based framework}
+  spec.summary       = %q{Trails provides a framework with a few tools built on the ideas of rails.}
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
