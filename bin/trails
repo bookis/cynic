@@ -22,7 +22,7 @@ module Trails
       make_file("config/routes.rb") do |file|
         file.write <<-HEREDOC
 Trails.application.routing.define do |map|
-  # map.get "/", to: [ControllerName.new, :action]
+  # map.get "/", to: [HomeController.new, :index]
 end
         HEREDOC
       end
@@ -63,8 +63,25 @@ end
       make_file("config.ru") do |file|
         file.write <<-HEREDOC
 require './config/application'
-#{@app_name}::Application.initialize!
-run Trails.application
+#{self.name} = #{@app_name}::Application.initialize!
+run #{self.name}
+        HEREDOC
+      end
+    end
+    
+    def create_layout
+      Dir.mkdir([self.name, "app", "views", "layouts"].join("/"))
+      make_file("app/views/layouts/application.html.erb") do |file|
+        file.write <<-HEREDOC
+<!DOCTYPE html>
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <title></title>
+</head>
+
+<body>
+  <%= yield %>  
+</body>
         HEREDOC
       end
     end
@@ -79,10 +96,15 @@ when "new"
   Dir.mkdir([generator.name, "app", "controllers"].join("/"))
   Dir.mkdir([generator.name, "app", "views"].join("/"))
   Dir.mkdir([generator.name, "app", "models"].join("/"))
+  Dir.mkdir([generator.name, "public"].join("/"))
+  Dir.mkdir([generator.name, "public", "stylesheets"].join("/"))
+  Dir.mkdir([generator.name, "public", "javascripts"].join("/"))
+  Dir.mkdir([generator.name, "public", "images"].join("/"))
   generator.create_config
   generator.create_application
   generator.create_gemfile
   generator.create_routes
+  generator.create_layout
 when "server"
   `shotgun -p 4545 -s puma`
 end

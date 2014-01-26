@@ -3,8 +3,12 @@ module Trails
     attr_reader :routing
     
     def self.initialize!
-      self.new
+      Trails.application = self.new
       require './config/routes'
+      builder = Rack::Builder.new
+      builder.use Rack::Static, :urls => ["/javascripts", "/stylesheets", "/images"], :root => "public"
+      builder.run Trails.application
+      builder
     end
     
     def initialize
