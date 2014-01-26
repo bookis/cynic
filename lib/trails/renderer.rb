@@ -18,7 +18,7 @@ module Trails
     end
     
     def path_prefix
-      "views/"
+      "app/views/"
     end
     
     def layout_exists?
