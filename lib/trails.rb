@@ -3,7 +3,7 @@ require 'trails/configuration'
 
 module Trails
   class << self
-    attr_accessor :configuration
+    attr_accessor :configuration, :application
     
     def configure
       @configuration = Configuration.new

@@ -2,62 +2,85 @@
 require "fileutils"
 require "trails"
 
-def make_file(name, &block)
-  File.open("#{@name}/#{name}", "w") do |file|
-    block.call(file)
+module Trails
+  class Generator
+    attr_accessor :name, :options, :app_name
+    
+    def initialize(args)
+      @name, @options = args[1], args[2..-1]
+      @app_name = @name.capitalize
+    end
+    
+    
+    def make_file(name, &block)
+      File.open("#{@name}/#{name}", "w") do |file|
+        block.call(file)
+      end
+    end
+    
+    def create_routes
+      make_file("config/routes.rb") do |file|
+        file.write <<-HEREDOC
+Trails.application.routing.define do |map|
+  # map.get "/", to: [ControllerName.new, :action]
+end
+        HEREDOC
+      end
+      
+    end
+    
+    def create_gemfile
+      make_file("Gemfile") do |file|
+        file.write <<-HEREDOC
+source 'https://rubygems.org'
+
+gem "trails", "#{Trails::VERSION}"
+        HEREDOC
+      end
+      
+    end
+    
+    def create_application
+      make_file("config/application.rb") do |file|
+        file.write  <<-HEREDOC
+require 'trails'
+
+module #{@app_name}
+  class Application < Trails::App
+    # Your code here
+  end
+end
+
+        HEREDOC
+      end
+    end
+    
+    def create_config
+      Dir.mkdir([self.name, "config"].join("/"))
+      make_file("config.ru") do |file|
+        file.write <<-HEREDOC
+require './config/application'
+#{@app_name}::Application.initialize!
+run Trails.application
+        HEREDOC
+      end
+    end
   end
 end
 
 case ARGV[0]
 when "new"
-  @name, @options = ARGV[1], ARGV[2..-1]
-  @app_name = @name.capitalize
-  Dir.mkdir(@name)
-  Dir.mkdir([@name, "config"].join("/"))
-  Dir.mkdir([@name, "config", "environments"].join("/"))
-  
-  %w(production test development).each do |filename|
-    make_file("config/environments/#{filename}.rb") do |file|
-      file.write <<HEREDOC
-# 
-HEREDOC
-    end
-  end
-  
-  make_file("config.ru") do |file|
-    file.write <<HEREDOC
-require './config/application'
-run #{@app_name}.new
-
-HEREDOC
-  end
-  
-  make_file("config/application.rb") do |file|
-    file.write  <<HEREDOC
-require 'trails'
-
-class #{@app_name} < Trails::App
-  # Your code here
-end
-HEREDOC
-
-  end
-
-  make_file("Gemfile") do |file|
-    file.write <<HEREDOC
-source 'https://rubygems.org'
-
-gem "trails", "#{Trails::VERSION}"
-HEREDOC
-  end
-  
-  make_file("config/routes.rb") do |file|
-    file.write <<HEREDOC
-Trails.application.routing.define do |map|
-  # map get "/", to: [ControllerName.new, :action]
-end
-HEREDOC
-  end
-  
+  generator = Trails::Generator.new(ARGV)
+  Dir.mkdir(generator.name)
+  Dir.mkdir([generator.name, "app"].join("/"))
+  Dir.mkdir([generator.name, "app", "controllers"].join("/"))
+  Dir.mkdir([generator.name, "app", "views"].join("/"))
+  Dir.mkdir([generator.name, "app", "models"].join("/"))
+  generator.create_config
+  generator.create_application
+  generator.create_gemfile
+  generator.create_routes
+when "server"
+  `shotgun -p 4545 -s puma`
 end
 

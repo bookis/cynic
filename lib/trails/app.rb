@@ -2,7 +2,13 @@ module Trails
   class App
     attr_reader :routing
     
+    def self.initialize!
+      self.new
+      require './config/routes'
+    end
+    
     def initialize
+      Trails.application = self
       @routing = Routing.new
     end
     
