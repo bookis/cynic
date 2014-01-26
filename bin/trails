@@ -44,12 +44,15 @@ gem "trails", "#{Trails::VERSION}"
       make_file("config/application.rb") do |file|
         file.write  <<-HEREDOC
 require 'trails'
+Dir.glob(["./app/**/*.rb"]).each {|file| require file }
 
 module #{@app_name}
   class Application < Trails::App
     # Your code here
   end
 end
+
+
 
         HEREDOC
       end
