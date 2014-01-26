@@ -17,7 +17,7 @@ when "new"
   Dir.mkdir([@name, "config", "environments"].join("/"))
   
   %w(production test development).each do |filename|
-    make_file("config/environmennts/#{filename}.rb") do |file|
+    make_file("config/environments/#{filename}.rb") do |file|
       file.write <<HEREDOC
 # 
 HEREDOC
@@ -48,6 +48,14 @@ HEREDOC
 source 'https://rubygems.org'
 
 gem "trails", "#{Trails::VERSION}"
+HEREDOC
+  end
+  
+  make_file("config/routes.rb") do |file|
+    file.write <<HEREDOC
+Trails.application.routing.define do |map|
+  # map get "/", to: [ControllerName.new, :action]
+end
 HEREDOC
   end
   

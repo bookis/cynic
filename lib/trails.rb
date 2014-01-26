@@ -9,6 +9,10 @@ module Trails
       @configuration = Configuration.new
       yield(configuration) if block_given?
     end
+    
+    def application
+      @application ||= App.new
+    end
   end
 end
 
