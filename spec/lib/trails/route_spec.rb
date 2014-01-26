@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Trail::Route do
+describe Trails::Route do
   
   let(:route) { defined_route }
 
@@ -13,12 +13,12 @@ describe Trail::Route do
   end
   
   it "returns the index" do
-    Trail::Controller.any_instance.stub(:index).and_return("This is erb hello")
+    Trails::Controller.any_instance.stub(:index).and_return("This is erb hello")
     expect(route.go_to(:get, "/trails")).to eq "This is erb hello"
   end
   
   it "raises an Route::Error when the path doesn't exist" do
-    expect { route.go_to(:get, "/im-lost") }.to raise_error Trail::Route::Error, "undefined route GET '/im-lost'"
+    expect { route.go_to(:get, "/im-lost") }.to raise_error Trails::Route::Error, "undefined route GET '/im-lost'"
   end
   
 end
