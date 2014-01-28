@@ -1,4 +1,4 @@
-module Trails
+module Cynic
   class Response
     attr_reader :body
     def initialize(body)

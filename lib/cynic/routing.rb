@@ -1,4 +1,4 @@
-module Trails
+module Cynic
   class Routing
     class Error < StandardError;end
     

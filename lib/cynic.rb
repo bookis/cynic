@@ -1,7 +1,7 @@
-require "trails/version"
-require 'trails/configuration'
+require "cynic/version"
+require 'cynic/configuration'
 
-module Trails
+module Cynic
   class << self
     attr_accessor :configuration, :application
     
@@ -16,8 +16,8 @@ module Trails
   end
 end
 
-require 'trails/app'
-require 'trails/response'
-require 'trails/routing'
-require 'trails/controller'
-require 'trails/renderer'
+require 'cynic/app'
+require 'cynic/response'
+require 'cynic/routing'
+require 'cynic/controller'
+require 'cynic/renderer'

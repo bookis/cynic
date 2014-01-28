@@ -1,4 +1,4 @@
-module Trails
+module Cynic
   class Controller
     def render(action)
       @action = action

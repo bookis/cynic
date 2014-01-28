@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 require "fileutils"
-require "trails"
+require "cynic"
 
-module Trails
+module Cynic
   class Generator
     attr_accessor :name, :options, :app_name
     
@@ -21,7 +21,7 @@ module Trails
     def create_routes
       make_file("config/routes.rb") do |file|
         file.write <<-HEREDOC
-Trails.application.routing.define do |map|
+Cynic.application.routing.define do |map|
   # map.get "/", to: [HomeController.new, :index]
 end
         HEREDOC
@@ -34,7 +34,7 @@ end
         file.write <<-HEREDOC
 source 'https://rubygems.org'
 
-gem "trails", "#{Trails::VERSION}"
+gem "cynic", "#{Cynic::VERSION}"
         HEREDOC
       end
       
@@ -43,11 +43,11 @@ gem "trails", "#{Trails::VERSION}"
     def create_application
       make_file("config/application.rb") do |file|
         file.write  <<-HEREDOC
-require 'trails'
+require 'cynic'
 Dir.glob(["./app/**/*.rb"]).each {|file| require file }
 
 module #{@app_name}
-  class Application < Trails::App
+  class Application < Cynic::App
     # Your code here
   end
 end
@@ -90,7 +90,7 @@ end
 
 case ARGV[0]
 when "new"
-  generator = Trails::Generator.new(ARGV)
+  generator = Cynic::Generator.new(ARGV)
   Dir.mkdir(generator.name)
   Dir.mkdir([generator.name, "app"].join("/"))
   Dir.mkdir([generator.name, "app", "controllers"].join("/"))

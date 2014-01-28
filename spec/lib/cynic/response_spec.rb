@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Trails::Response do
-  let(:response) { Trails::Response.new("This is the body") }
+describe Cynic::Response do
+  let(:response) { Cynic::Response.new("This is the body") }
   describe "#each" do
     it "responds" do
       expect(response).to respond_to :each

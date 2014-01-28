@@ -1,2 +1,2 @@
-require 'trails'
+require 'cynic'
 require 'support/routing'

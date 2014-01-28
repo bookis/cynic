@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Trails::Routing do
+describe Cynic::Routing do
   
   let(:routing) { defined_routing }
 
@@ -13,12 +13,12 @@ describe Trails::Routing do
   end
   
   it "returns the index" do
-    Trails::Controller.any_instance.stub(:index).and_return("This is erb hello")
-    expect(routing.go_to(:get, "/trails")).to eq "This is erb hello"
+    Cynic::Controller.any_instance.stub(:index).and_return("This is erb hello")
+    expect(routing.go_to(:get, "/cynic")).to eq "This is erb hello"
   end
   
   it "raises an Routing::Error when the path doesn't exist" do
-    expect { routing.go_to(:get, "/im-lost") }.to raise_error Trails::Routing::Error, "undefined routing GET '/im-lost'"
+    expect { routing.go_to(:get, "/im-lost") }.to raise_error Cynic::Routing::Error, "undefined routing GET '/im-lost'"
   end
   
 end

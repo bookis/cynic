@@ -1,4 +1,4 @@
-module Trails
+module Cynic
   class Renderer
     def initialize(path)
       @full_path = path_prefix + path

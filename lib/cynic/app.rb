@@ -1,18 +1,18 @@
-module Trails
+module Cynic
   class App
     attr_reader :routing
     
     def self.initialize!
-      Trails.application = self.new
+      Cynic.application = self.new
       require './config/routes'
       builder = Rack::Builder.new
       builder.use Rack::Static, :urls => ["/javascripts", "/stylesheets", "/images"], :root => "public"
-      builder.run Trails.application
+      builder.run Cynic.application
       builder
     end
     
     def initialize
-      Trails.application = self
+      Cynic.application = self
       @routing = Routing.new
     end
     

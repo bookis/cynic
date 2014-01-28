@@ -1,4 +1,4 @@
-module Trails
+module Cynic
   class Configuration
     attr_accessor :environment
   end
