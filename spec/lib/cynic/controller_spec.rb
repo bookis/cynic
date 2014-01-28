@@ -5,11 +5,15 @@ class CynicController < Cynic::Controller
     @greeting = "hello"
     render :index
   end
+  
+  def do_i_live_in_a_tub?
+    @answer = "not yet"
+  end
 end
 
 describe Cynic::Controller do
   let(:controller) { CynicController.new }
-  
+  before { CynicController.instance_variable_set(:@before_actions, nil)}
   describe "#render" do
     it "finds a file" do
       Cynic::Renderer.any_instance.stub(:layout_file).and_return("<%= yield %>")
@@ -28,6 +32,50 @@ describe Cynic::Controller do
       File.should_receive(:read).with("app/views/cynic/index.html.erb").once.and_return('This is erb.')
       expect(controller.index).to eq "hello This is erb."
     end
+  end
+  
+  describe ".before_action" do
+    it "responds to" do
+      expect(CynicController.respond_to?(:before_action)).to be_true
+    end
     
+    it "assigns each of the things to an array" do
+      CynicController.before_action :do_i_live_in_a_tub?
+      expect(CynicController.before_actions[:all]).to include :do_i_live_in_a_tub?
+    end
+    
+    context ":all" do
+      it "calls each before action within :all" do
+        CynicController.before_action :do_i_live_in_a_tub?
+        File.should_receive(:read).with("app/views/cynic/index.html.erb").once.and_return('This is erb.')
+        controller.should_receive(:do_i_live_in_a_tub?).once.and_return(true)
+        controller.index
+      end
+    
+      it "can use a instance var defined in a before action" do
+        CynicController.before_action :do_i_live_in_a_tub?
+        File.should_receive(:read).with("app/views/cynic/index.html.erb").once.and_return('Do I live in a tub? <%= @answer %>.')
+        expect(controller.index).to eq 'Do I live in a tub? not yet.'
+      end
+    end
+    
+    context "when using the :only option" do
+      it "assigns the action name it should be nested under" do
+        CynicController.before_action :do_i_live_in_a_tub?, only: :show
+        expect(CynicController.before_actions[:show]).to include :do_i_live_in_a_tub?
+      end
+
+      it "assigns the action names it should be nested under" do
+        CynicController.before_action :do_i_live_in_a_tub?, only: [:show]
+        expect(CynicController.before_actions[:show]).to include :do_i_live_in_a_tub?
+      end
+      
+      it "calls each before action within :all" do
+        CynicController.before_action :do_i_live_in_a_tub?, only: :index
+        File.should_receive(:read).with("app/views/cynic/index.html.erb").once.and_return('This is erb.')
+        controller.should_receive(:do_i_live_in_a_tub?).once.and_return(true)
+        controller.index
+      end
+    end
   end
 end
