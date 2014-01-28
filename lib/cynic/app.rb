@@ -22,7 +22,7 @@ module Cynic
     end
     
     def routing_to_request
-      routing.go_to @env["REQUEST_METHOD"].downcase.to_sym, @env["REQUEST_URI"]
+      routing.go_to @env["REQUEST_METHOD"].downcase.to_sym, @env["REQUEST_PATH"]
     end
     
     def send_response

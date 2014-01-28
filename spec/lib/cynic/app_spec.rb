@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Cynic::App do
-  let(:env) { {"REQUEST_METHOD" => "GET", "REQUEST_URI" => "/cynic"} }
+  let(:env) { {"REQUEST_METHOD" => "GET", "REQUEST_PATH" => "/cynic"} }
   let(:cynic) { Cynic.application }
   before { require "support/routes" }
   
