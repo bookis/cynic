@@ -1,6 +1,6 @@
 # Cynic
 
-TODO: Write a gem description
+Cynic is a Lightweight Rack-based framework. Cynic provides a framework with a few tools built on the ideas of rails.
 
 ## Installation
 
@@ -18,7 +18,9 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```bash
+cynic new <name>
+```
 
 ## Contributing
 
