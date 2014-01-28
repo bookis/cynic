@@ -1,8 +1,9 @@
 module Cynic
   class Controller
+    
     def render(action)
       @action = action
-      Renderer.new(full_path).body
+      Renderer.new(full_path, self).body
     end
 
     # The +name+ split and joined into a string seperated by "/"'s
@@ -19,5 +20,6 @@ module Cynic
     def name
       self.class.to_s.gsub(/controller$/i, "")
     end
+    
   end
 end

@@ -1,12 +1,17 @@
 module Cynic
   class Renderer
-    def initialize(path)
+    def initialize(path, controller=nil)
+      
+      controller.instance_variables.each do |method|
+        self.instance_variable_set(method, controller.instance_variable_get(method))
+      end
+      
       @full_path = path_prefix + path
       @layout    = path_prefix + "layouts/application.html.erb"
     end
     
     def body
-      layout { ERB.new(File.read(@full_path)).result }
+      layout { ERB.new(File.read(@full_path)).result(binding) }
     end
     
     def layout 
