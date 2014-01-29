@@ -12,10 +12,15 @@ module Cynic
     end
     
     def go_to(request_method, request_path)
-      klass, action = @routings[request_method.to_sym][request_path]
-      klass.send(action)
-    rescue TypeError
-      raise Error, "undefined routing #{request_method.upcase} '#{request_path}'"
+      if action(request_method, request_path)
+        action
+      else
+        raise Error, "undefined routing #{request_method.upcase} '#{request_path}'"
+      end
+    end
+    
+    def action(request_method=nil, request_path=nil)
+      @action ||= @routings[request_method.to_sym][request_path]
     end
     
     def get(path, options={})

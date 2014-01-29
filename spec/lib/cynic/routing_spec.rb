@@ -5,16 +5,16 @@ describe Cynic::Routing do
   let(:routing) { defined_routing }
 
   it "calls the method to be returned" do
-    expect(routing.go_to(:get, "/")).to eq ""
+    expect(routing.go_to(:get, "/")).to eq [String, :new]
   end
   
   it "calls the method to be returned" do
-    expect(routing.go_to(:get, "/blog")).to be_an_instance_of Float
+    expect(routing.go_to(:get, "/blog").last).to eq :rand
   end
   
   it "returns the index" do
     Cynic::Controller.any_instance.stub(:index).and_return("This is erb hello")
-    expect(routing.go_to(:get, "/cynic")).to eq "This is erb hello"
+    expect(routing.go_to(:get, "/cynic").first).to be_an_instance_of Cynic::Controller
   end
   
   it "raises an Routing::Error when the path doesn't exist" do

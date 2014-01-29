@@ -30,7 +30,12 @@ module Cynic
     end
     
     def response
-      Response.new(self.routing_to_request)
+      Response.new(execute_controller_actions)
+    end
+    
+    def execute_controller_actions
+      object, method = self.routing_to_request
+      object.send(method)
     end
     
     def status
