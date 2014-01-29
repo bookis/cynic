@@ -18,7 +18,6 @@ module Cynic
     
     def call(env)
       @env = env
-      puts @env.inspect
       send_response
     end
     
