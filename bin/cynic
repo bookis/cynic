@@ -51,9 +51,6 @@ module #{@app_name}
     # Your code here
   end
 end
-
-
-
         HEREDOC
       end
     end
@@ -65,6 +62,16 @@ end
 require './config/application'
 #{self.name} = #{@app_name}::Application.initialize!
 run #{self.name}
+        HEREDOC
+      end
+    end
+    
+    def create_controller
+      make_file("app/controllers/application_controller.rb") do |file|
+        file.write <<-HEREDOC
+class ApplicationController < Cynic::Controller
+  # Application wide methods and before_actions go here
+end
         HEREDOC
       end
     end
@@ -102,6 +109,7 @@ when "new"
   Dir.mkdir([generator.name, "public", "images"].join("/"))
   generator.create_config
   generator.create_application
+  generator.create_controller
   generator.create_gemfile
   generator.create_routes
   generator.create_layout

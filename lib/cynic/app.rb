@@ -35,7 +35,7 @@ module Cynic
     
     def execute_controller_actions
       object, method = self.routing_to_request
-      object.send(method)
+      object.response(method)
     end
     
     def status
