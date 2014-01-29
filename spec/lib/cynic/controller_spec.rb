@@ -3,7 +3,7 @@ require 'spec_helper'
 class CynicController < Cynic::Controller
   def index
     @greeting = "hello"
-    render :index
+    render :template
   end
   
   def do_i_live_in_a_tub?
@@ -23,13 +23,13 @@ describe Cynic::Controller do
     
     it "controller instance vars are available to the view" do
       Cynic::Renderer.any_instance.stub(:layout_file).and_return("<%= yield %>")
-      File.should_receive(:read).with("app/views/cynic/index.html.erb").once.and_return('This is erb <%= @greeting %>')
+      File.should_receive(:read).with("app/views/cynic/template.html.erb").once.and_return('This is erb <%= @greeting %>')
       expect(controller.index).to eq "This is erb hello"
     end
     
     it "controller instance vars are available to the layout" do
       Cynic::Renderer.any_instance.stub(:layout_file).and_return("<%= @greeting %> <%= yield %>")
-      File.should_receive(:read).with("app/views/cynic/index.html.erb").once.and_return('This is erb.')
+      File.should_receive(:read).with("app/views/cynic/template.html.erb").once.and_return('This is erb.')
       expect(controller.index).to eq "hello This is erb."
     end
   end
@@ -47,15 +47,15 @@ describe Cynic::Controller do
     context ":all" do
       it "calls each before action within :all" do
         CynicController.before_action :do_i_live_in_a_tub?
-        File.should_receive(:read).with("app/views/cynic/index.html.erb").once.and_return('This is erb.')
+        File.should_receive(:read).with("app/views/cynic/template.html.erb").once.and_return('This is erb.')
         controller.should_receive(:do_i_live_in_a_tub?).once.and_return(true)
-        controller.index
+        controller.response(:index)
       end
     
       it "can use a instance var defined in a before action" do
         CynicController.before_action :do_i_live_in_a_tub?
-        File.should_receive(:read).with("app/views/cynic/index.html.erb").once.and_return('Do I live in a tub? <%= @answer %>.')
-        expect(controller.index).to eq 'Do I live in a tub? not yet.'
+        File.should_receive(:read).with("app/views/cynic/template.html.erb").once.and_return('Do I live in a tub? <%= @answer %>.')
+        expect(controller.response(:index)).to eq 'Do I live in a tub? not yet.'
       end
     end
     
@@ -72,9 +72,9 @@ describe Cynic::Controller do
       
       it "calls each before action within :all" do
         CynicController.before_action :do_i_live_in_a_tub?, only: :index
-        File.should_receive(:read).with("app/views/cynic/index.html.erb").once.and_return('This is erb.')
+        File.should_receive(:read).with("app/views/cynic/template.html.erb").once.and_return('This is erb.')
         controller.should_receive(:do_i_live_in_a_tub?).once.and_return(true)
-        controller.index
+        controller.response(:index)
       end
     end
   end

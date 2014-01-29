@@ -2,7 +2,6 @@ module Cynic
   class Controller
     class << self
       attr_accessor :before_actions
-      
       def before_actions
         @before_actions ||= Hash.new { Set.new }
       end
@@ -20,13 +19,19 @@ module Cynic
       end
     end
     
-    
     def render(action)
       @action = action
-      execute_before_actions
       Renderer.new(full_path, self).body
     end
+    
+    def response(method)
+      eval_set_of_actions
+      eval_set_of_actions(method)
+      send method
+    end
 
+    private
+    
     # The +name+ split and joined into a string seperated by "/"'s
     def path
       name.split("::").join("/").downcase
@@ -40,14 +45,7 @@ module Cynic
     # The Controllers class name without the word `controller` in it.
     def name
       self.class.to_s.gsub(/controller$/i, "")
-    end
-    
-    private
-    
-    def execute_before_actions
-      eval_set_of_actions
-      eval_set_of_actions(@action)
-    end
+    end    
     
     def eval_set_of_actions(set=:all)
       self.class.before_actions[set].each {|action| eval(action.to_s)}
