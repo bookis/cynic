@@ -4,16 +4,16 @@ require "cynic"
 
 module Cynic
   class Generator
-    attr_accessor :name, :options, :app_name
+    attr_accessor :name, :options, :app_name, :dir
     
     def initialize(args)
-      @name, @options = args[1], args[2..-1]
+      @dir, @name, @options = args[1], args[1].gsub("-", "_"), args[2..-1]
       @app_name = @name.gsub(/(?<=[_-]|^|\s)(\w)/){$1.upcase}.gsub(/(?:[_-]|\s)(\w)/,'\1')
     end
     
     
     def make_file(name, &block)
-      File.open("#{@name}/#{name}", "w") do |file|
+      File.open("#{@dir}/#{name}", "w") do |file|
         block.call(file)
       end
     end
@@ -56,7 +56,7 @@ end
     end
     
     def create_config
-      Dir.mkdir([self.name, "config"].join("/"))
+      Dir.mkdir([self.dir, "config"].join("/"))
       make_file("config.ru") do |file|
         file.write <<-HEREDOC
 require './config/application'
@@ -77,7 +77,7 @@ end
     end
     
     def create_layout
-      Dir.mkdir([self.name, "app", "views", "layouts"].join("/"))
+      Dir.mkdir([self.dir, "app", "views", "layouts"].join("/"))
       make_file("app/views/layouts/application.html.erb") do |file|
         file.write <<-HEREDOC
 <!DOCTYPE html>
@@ -98,15 +98,15 @@ end
 case ARGV[0]
 when "new"
   generator = Cynic::Generator.new(ARGV)
-  Dir.mkdir(generator.name)
-  Dir.mkdir([generator.name, "app"].join("/"))
-  Dir.mkdir([generator.name, "app", "controllers"].join("/"))
-  Dir.mkdir([generator.name, "app", "views"].join("/"))
-  Dir.mkdir([generator.name, "app", "models"].join("/"))
-  Dir.mkdir([generator.name, "public"].join("/"))
-  Dir.mkdir([generator.name, "public", "stylesheets"].join("/"))
-  Dir.mkdir([generator.name, "public", "javascripts"].join("/"))
-  Dir.mkdir([generator.name, "public", "images"].join("/"))
+  Dir.mkdir(generator.dir)
+  Dir.mkdir([generator.dir, "app"].join("/"))
+  Dir.mkdir([generator.dir, "app", "controllers"].join("/"))
+  Dir.mkdir([generator.dir, "app", "views"].join("/"))
+  Dir.mkdir([generator.dir, "app", "models"].join("/"))
+  Dir.mkdir([generator.dir, "public"].join("/"))
+  Dir.mkdir([generator.dir, "public", "stylesheets"].join("/"))
+  Dir.mkdir([generator.dir, "public", "javascripts"].join("/"))
+  Dir.mkdir([generator.dir, "public", "images"].join("/"))
   generator.create_config
   generator.create_application
   generator.create_controller
