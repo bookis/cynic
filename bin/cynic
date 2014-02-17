@@ -8,7 +8,7 @@ module Cynic
     
     def initialize(args)
       @name, @options = args[1], args[2..-1]
-      @app_name = @name.capitalize
+      @app_name = @name.gsub(/(?<=[_-]|^|\s)(\w)/){$1.upcase}.gsub(/(?:[_-]|\s)(\w)/,'\1')
     end
     
     
