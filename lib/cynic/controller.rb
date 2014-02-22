@@ -1,5 +1,6 @@
 module Cynic
   class Controller
+    attr_accessor :request
     class << self
       attr_accessor :before_actions
       def before_actions
@@ -30,6 +31,10 @@ module Cynic
       send method
     end
 
+    def params
+      request["rack.input"]
+    end
+    
     private
     
     # The +name+ split and joined into a string seperated by "/"'s

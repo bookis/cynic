@@ -34,7 +34,12 @@ end
         file.write <<-HEREDOC
 source 'https://rubygems.org'
 
+gem "rake"
+
 gem "cynic", "#{Cynic::VERSION}"
+gem "activerecord"
+gem "pg"
+
         HEREDOC
       end
       
@@ -44,7 +49,10 @@ gem "cynic", "#{Cynic::VERSION}"
       make_file("config/application.rb") do |file|
         file.write  <<-HEREDOC
 require 'cynic'
+require 'active_record'
 Dir.glob(["./app/**/*.rb"]).each {|file| require file }
+
+ActiveRecord::Base.establish_connection(YAML::load(File.open('config/database.yml'))[ENV["RACK_ENV"]])
 
 module #{@app_name}
   class Application < Cynic::App
@@ -56,7 +64,6 @@ end
     end
     
     def create_config
-      Dir.mkdir([self.dir, "config"].join("/"))
       make_file("config.ru") do |file|
         file.write <<-HEREDOC
 require './config/application'
@@ -77,7 +84,6 @@ end
     end
     
     def create_layout
-      Dir.mkdir([self.dir, "app", "views", "layouts"].join("/"))
       make_file("app/views/layouts/application.html.erb") do |file|
         file.write <<-HEREDOC
 <!DOCTYPE html>
@@ -92,27 +98,169 @@ end
         HEREDOC
       end
     end
+    
+    def create_database_placeholder
+      make_file("config/database.yml") do |file|
+        file.write <<-HEREDOC
+development:
+  adapter: 'postgresql'
+  database: '#{self.name}_development'
+  encoding: unicode
+  pool: 5
+  
+test:
+  adapter: 'postgresql'
+  database: '#{self.name}_test'
+  encoding: unicode
+  pool: 5
+  
+production:
+  adapter: 'postgresql'
+  database: '#{self.name}_production'
+  encoding: unicode
+  pool: 5
+  
+        HEREDOC
+      end
+    end
+    
+    def create_rake_tasks
+      make_file("Rakefile") do |file|
+        file.write <<-HEREDOC
+require 'yaml'
+require 'active_record'
+Dir["config/tasks/*.rake"].sort.each { |ext| load ext }
+        HEREDOC
+      end
+      
+      make_file("config/tasks/migrations.rake") do |file|
+        file.write <<-HEREDOC
+task :environment do
+  env = ENV["RACK_ENV"] ? ENV["RACK_ENV"] : "development"
+  ActiveRecord::Base.establish_connection(YAML::load(File.open('config/database.yml'))[env])
+end
+
+namespace :db do
+  def connect(conf)
+    if conf["adapter"] == 'postgresql'
+      ActiveRecord::Base.establish_connection(conf.merge('database' => 'postgres'))
+    else
+      ActiveRecord::Base.establish_connection(conf.merge('database' => nil))
+    end
+  end
+
+  desc "Create the database defined in config/database.yml for the current RACK_ENV"
+  task :create do
+    env = ENV["RACK_ENV"] ? ENV["RACK_ENV"] : "development"
+    config = YAML::load(File.open('config/database.yml'))[env]
+    connect(config)
+    ActiveRecord::Base.connection.create_database(config['database'])
+  end
+
+  namespace :create do
+    desc "Create all the local databases defined in config/database.yml"
+    task :all do
+      YAML::load(File.open('config/database.yml')).each_value do |config|
+        next unless config['database']
+        unless @config
+          connect(config)
+          @config = 1
+        end
+        ActiveRecord::Base.connection.create_database(config['database'])
+      end
+    end
+  end
+
+  desc "Drops the database for the current RACK_ENV"
+  task :drop do
+    env = ENV["RACK_ENV"] ? ENV["RACK_ENV"] : "development"
+    config = YAML::load(File.open('config/database.yml'))[env]
+    connect(config)
+    ActiveRecord::Base.connection.drop_database config['database']
+  end
+
+  namespace :drop do
+    desc "Drops all the local databases defined in config/database.yml"
+    task :all do
+      YAML::load(File.open('config/database.yml')).each_value do |config|
+        next unless config['database']
+        unless @config
+          connect(config)
+          @config = 1
+        end
+        ActiveRecord::Base.connection.drop_database config['database']
+      end
+    end
+  end
+
+  desc "Migrate the database through scripts in db/migrate"
+  task(:migrate => :environment) do
+    ActiveRecord::Migrator.migrate('db/migrate', ENV["VERSION"] ? ENV["VERSION"].to_i : nil )
+    Rake::Task["db:schema:dump"].invoke if ActiveRecord::Base.schema_format == :ruby
+  end
+
+  namespace :migrate do
+    desc 'Runs the "down" for a given migration VERSION'
+    task(:down => :environment) do
+      ActiveRecord::Migrator.down('db/migrate', ENV["VERSION"] ? ENV["VERSION"].to_i : nil )
+      Rake::Task["db:schema:dump"].invoke if ActiveRecord::Base.schema_format == :ruby
+    end
+
+    desc 'Runs the "up" for a given migration VERSION'
+    task(:up => :environment) do
+      ActiveRecord::Migrator.up('db/migrate', ENV["VERSION"] ? ENV["VERSION"].to_i : nil )
+      Rake::Task["db:schema:dump"].invoke if ActiveRecord::Base.schema_format == :ruby
+    end
+
+    desc "Rollbacks the database one migration and re migrate up"
+    task(:redo => :environment) do
+      ActiveRecord::Migrator.rollback('db/migrate', 1 )
+      ActiveRecord::Migrator.up('db/migrate', nil )
+      Rake::Task["db:schema:dump"].invoke if ActiveRecord::Base.schema_format == :ruby
+    end
+  end
+
+  namespace :schema do
+    task :dump => :environment do
+      require 'active_record/schema_dumper'
+      File.open(ENV['SCHEMA'] || "db/schema.rb", "w") do |file|
+        ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
+      end
+    end
+  end
+end
+        HEREDOC
+      end
+    end
+    
+    def create_schema
+      make_file("db/schema.rb") do |file|
+        file.write <<-HEREDOC
+  
+        HEREDOC
+      end
+    end
   end
 end
 
 case ARGV[0]
 when "new"
   generator = Cynic::Generator.new(ARGV)
+  
   Dir.mkdir(generator.dir)
-  Dir.mkdir([generator.dir, "app"].join("/"))
-  Dir.mkdir([generator.dir, "app", "controllers"].join("/"))
-  Dir.mkdir([generator.dir, "app", "views"].join("/"))
-  Dir.mkdir([generator.dir, "app", "models"].join("/"))
-  Dir.mkdir([generator.dir, "public"].join("/"))
-  Dir.mkdir([generator.dir, "public", "stylesheets"].join("/"))
-  Dir.mkdir([generator.dir, "public", "javascripts"].join("/"))
-  Dir.mkdir([generator.dir, "public", "images"].join("/"))
+  %w(db app app/controllers app/views app/views/layouts app/models public public/stylesheets public/javascripts public/images config config/tasks).each do |dir|
+    Dir.mkdir([generator.dir, dir].join("/"))
+  end
+  
   generator.create_config
   generator.create_application
   generator.create_controller
   generator.create_gemfile
   generator.create_routes
   generator.create_layout
+  generator.create_database_placeholder
+  generator.create_rake_tasks
+  generator.create_schema
 when "server"
   `shotgun -p 4545 -s puma`
 end

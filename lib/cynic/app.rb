@@ -21,8 +21,12 @@ module Cynic
       send_response
     end
     
+    def request
+      @request ||= Rack::Request.new(@env)
+    end
+    
     def routing_to_request
-      routing.go_to @env["REQUEST_METHOD"].downcase.to_sym, @env["REQUEST_PATH"]
+      routing.go_to request.request_method.downcase.to_sym, @env["REQUEST_PATH"]
     end
     
     def send_response
@@ -35,6 +39,7 @@ module Cynic
     
     def execute_controller_actions
       object, method = self.routing_to_request
+      object.request = request if object.respond_to? :request=
       object.response(method)
     end
     

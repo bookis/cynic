@@ -1,3 +1,4 @@
+require 'rack'
 require "cynic/version"
 require 'cynic/configuration'
 
@@ -21,3 +22,4 @@ require 'cynic/response'
 require 'cynic/routing'
 require 'cynic/controller'
 require 'cynic/renderer'
+require 'cynic/route_option'
