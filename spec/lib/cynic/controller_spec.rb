@@ -16,7 +16,11 @@ describe Cynic::Controller do
   before { CynicController.instance_variable_set(:@before_actions, nil)}
   
   describe "#request" do
-    before { controller.request = {"rack.input" => {id: 1}} }
+    before { 
+      request = double("Rack::Request")
+      request.stub(:params) { {id: 1} }
+      controller.request = request
+    }
     it "has params" do
       expect(controller.params).to eq({id: 1})
     end

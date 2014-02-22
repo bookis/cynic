@@ -38,9 +38,14 @@ module Cynic
     end
     
     def execute_controller_actions
-      object, method = self.routing_to_request
-      object.request = request if object.respond_to? :request=
-      object.response(method)
+      route = self.routing_to_request
+      if route.object.respond_to? :request=
+        route.params.each do |k,v|
+          request.update_param(k, v)
+        end
+        route.object.request = request 
+      end
+      route.object.response(route.method)
     end
     
     def status

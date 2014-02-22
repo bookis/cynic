@@ -32,7 +32,7 @@ module Cynic
     end
 
     def params
-      request["rack.input"]
+      request.params
     end
     
     private
