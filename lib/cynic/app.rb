@@ -52,8 +52,12 @@ module Cynic
       200
     end
     
+    def content_type
+      request.content_type || "text/html"
+    end
+    
     def headers
-      {"CONTENT-TYPE" => "text/html"}
+      {"CONTENT-TYPE" => content_type}
     end
     
   end

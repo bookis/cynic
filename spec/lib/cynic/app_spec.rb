@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Cynic::App do
-  let(:env) { {"REQUEST_METHOD" => "GET", "REQUEST_PATH" => "/cynic", "rack.input" => "wtf"} }
+  let(:env) { {"REQUEST_METHOD" => "GET", "REQUEST_PATH" => "/cynic", "rack.input" => "wtf", "CONTENT_TYPE" => "text/json"} }
   let(:cynic) { Cynic.application }
   before { require "support/routes" }
   
@@ -37,6 +37,10 @@ describe Cynic::App do
       
       it "has a response object with a body" do
         expect(cynic.call(env)[2].body).to eq "This is erb hello"
+      end
+      
+      it "has a response of json" do
+        expect(cynic.call(env)[1]["CONTENT-TYPE"]).to eq "text/json"
       end
     end
     
