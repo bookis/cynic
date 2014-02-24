@@ -13,16 +13,17 @@ end
 
 describe Cynic::Controller do
   let(:controller) { CynicController.new }
+  let(:env) { {"REQUEST_METHOD" => "GET", "REQUEST_PATH" => "/cynic", "rack.input" => "wtf", "QUERY_STRING" => "id=1",  "CONTENT_TYPE" => "text/json"} }
+  
   before { CynicController.instance_variable_set(:@before_actions, nil)}
   
   describe "#request" do
     before { 
-      request = double("Rack::Request")
-      request.stub(:params) { {id: 1} }
+      request = Rack::Request.new(env)
       controller.request = request
     }
     it "has params" do
-      expect(controller.params).to eq({id: 1})
+      expect(controller.params[:id]).to eq "1"
     end
   end
   describe "#render" do

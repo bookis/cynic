@@ -3,6 +3,7 @@ module Cynic
     attr_accessor :request
     class << self
       attr_accessor :before_actions
+      
       def before_actions
         @before_actions ||= Hash.new { Set.new }
       end
@@ -32,6 +33,10 @@ module Cynic
     end
 
     def params
+      request.params.each do |k,v|
+        request.update_param(k.to_sym, v) if k.is_a? String
+      end
+      
       request.params
     end
     

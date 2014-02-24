@@ -18,46 +18,30 @@ module Cynic
     
     def call(env)
       @env = env
-      send_response
+      response.send
     end
     
     def request
-      @request ||= Rack::Request.new(@env)
+      Rack::Request.new(@env)
     end
     
     def routing_to_request
       routing.go_to request.request_method.downcase.to_sym, @env["REQUEST_PATH"]
     end
     
-    def send_response
-      [status, headers, response]
-    end
-    
     def response
-      Response.new(execute_controller_actions)
+      Response.new(execute_controller_actions, request)
     end
     
     def execute_controller_actions
       route = self.routing_to_request
-      if route.object.respond_to? :request=
-        route.params.each do |k,v|
-          request.update_param(k, v)
-        end
-        route.object.request = request 
+      
+      route.params.each do |k,v|
+        request.update_param(k, v)
       end
+      route.object.request = request 
+      
       route.object.response(route.method)
-    end
-    
-    def status
-      200
-    end
-    
-    def content_type
-      request.content_type || "text/html"
-    end
-    
-    def headers
-      {"CONTENT-TYPE" => content_type}
     end
     
   end
