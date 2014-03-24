@@ -6,7 +6,7 @@ module Cynic
       Cynic.application = self.new
       require './config/routes'
       builder = Rack::Builder.new
-      builder.use Rack::Static, :urls => ["/javascripts", "/stylesheets", "/images"], :root => "public"
+      builder.use Rack::Static, :urls => ["/javascripts", "/stylesheets", "/images" "/bower_components"], :root => "public"
       builder.run Cynic.application
       builder
     end
